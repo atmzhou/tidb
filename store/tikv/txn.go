@@ -40,6 +40,7 @@ type tikvTxn struct {
 	lockKeys  [][]byte
 	dirty     bool
 	setCnt    int64
+	retryCnt  int
 }
 
 func newTiKVTxn(store *tikvStore) (*tikvTxn, error) {
@@ -213,4 +214,8 @@ func (txn *tikvTxn) Len() int {
 
 func (txn *tikvTxn) Size() int {
 	return txn.us.Size()
+}
+
+func (txn *tikvTxn) SetRetryCnt(retryCnt int) {
+	txn.retryCnt = retryCnt
 }

@@ -139,6 +139,7 @@ type session struct {
 	sessionManager util.SessionManager
 
 	statsCollector *statistics.SessionStatsCollector
+	retryCnt int
 }
 
 // Cancel cancels the execution of current transaction.
@@ -423,6 +424,7 @@ func (s *session) retry(maxCnt int, infoSchemaChanged bool) error {
 	nh := GetHistory(s)
 	var err error
 	for {
+		s.retryCnt = retryCnt
 		s.PrepareTxnCtx(ctx)
 		s.sessionVars.RetryInfo.ResetOffset()
 		for i, sr := range nh.history {
@@ -1284,6 +1286,7 @@ func (s *session) ActivePendingTxn() error {
 		return errors.Trace(err)
 	}
 	s.txn = txn
+	s.txn.SetRetryCnt(s.retryCnt)
 	s.sessionVars.TxnCtx.StartTS = s.txn.StartTS()
 	err = s.loadCommonGlobalVariablesIfNeeded()
 	if err != nil {

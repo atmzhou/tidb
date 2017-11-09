@@ -160,6 +160,15 @@ type Backoffer struct {
 	errors     []error
 	ctx        goctx.Context
 	types      []backoffType
+	retryCnt   int
+}
+
+func NewBackoffer(maxSleep int, ctx goctx.Context, retryCnt int) *Backoffer {
+	return &Backoffer{
+		maxSleep: maxSleep,
+		ctx:      ctx,
+		retryCnt: retryCnt,
+	}
 }
 
 // NewBackoffer creates a Backoffer with maximum sleep time(in ms).
@@ -192,10 +201,10 @@ func (b *Backoffer) Backoff(typ backoffType, err error) error {
 
 	b.totalSleep += f()
 	b.types = append(b.types, typ)
-
+	ratio := (10.0 - b.retryCnt) * 10.0
 	log.Debugf("%v, retry later(totalSleep %dms, maxSleep %dms)", err, b.totalSleep, b.maxSleep)
 	b.errors = append(b.errors, err)
-	if b.maxSleep > 0 && b.totalSleep >= b.maxSleep {
+	if b.maxSleep > 0 && b.totalSleep >= b.maxSleep * ratio {
 		errMsg := fmt.Sprintf("backoffer.maxSleep %dms is exceeded, errors:", b.maxSleep)
 		for i, err := range b.errors {
 			// Print only last 3 errors for non-DEBUG log levels.

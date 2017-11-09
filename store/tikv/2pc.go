@@ -595,7 +595,7 @@ func (c *twoPhaseCommitter) execute(ctx goctx.Context) error {
 	ctx = opentracing.ContextWithSpan(goctx.Background(), span)
 
 	binlogChan := c.prewriteBinlog()
-	err := c.prewriteKeys(NewBackoffer(prewriteMaxBackoff, ctx), c.keys)
+	err := c.prewriteKeys(NewBackoffer(prewriteMaxBackoff, ctx, c.txn.retryCnt), c.keys)
 	if binlogChan != nil {
 		binlogErr := <-binlogChan
 		if binlogErr != nil {
