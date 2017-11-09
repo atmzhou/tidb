@@ -129,7 +129,7 @@ capacity = 100
 
 [opentracing]
 # Enable opentracing.
-enable = false
+enable = true
 
 # Whether to enable the rpc metrics.
 rpc-metrics = false
