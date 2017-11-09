@@ -163,7 +163,7 @@ type Backoffer struct {
 	retryCnt   int
 }
 
-func NewBackoffer(maxSleep int, ctx goctx.Context, retryCnt int) *Backoffer {
+func NewBackofferwithRetryCnt(maxSleep int, ctx goctx.Context, retryCnt int) *Backoffer {
 	return &Backoffer{
 		maxSleep: maxSleep,
 		ctx:      ctx,
